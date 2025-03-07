@@ -1,0 +1,33 @@
+name: PagerDuty Helper GitHub Push Actions
+on:
+  push:
+    tags:
+      - '**'
+jobs:
+    release-from-tag:
+      permissions:
+        contents: write
+      runs-on: ubuntu-latest
+      steps:
+        - name: Check out repository code
+          uses: actions/checkout@v4
+        - id: checkout-lint-build-test
+          uses: ./.github/actions/lint-build-test
+        - uses: octokit/request-action@v2.x
+          id: create_release
+          with:
+            route: POST /repos/{owner}/{repo}/releases
+            owner: xtoik
+            repo: pagerduty-helper
+            name: PagerDuty Helper ${{  github.ref_name }}
+            tag_name: ${{  github.ref_name }}
+            generate_release_notes: true
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        - name: Package chrome extension
+          run: |
+            mv dist pagerduty-helper_${{  github.ref_name }} 
+            zip -r pagerduty-helper_${{  github.ref_name }}.zip pagerduty-helper_${{  github.ref_name }}/
+            gh release upload ${{  github.ref_name }} pagerduty-helper_${{  github.ref_name }}.zip
+          env:
+            GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
