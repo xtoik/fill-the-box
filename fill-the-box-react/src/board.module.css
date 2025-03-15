@@ -1,0 +1,64 @@
+.gameContainer {
+    display: flex;
+    flex-direction: row;
+    font-size: min(4vh, 4vw);
+    align-items: center;
+    justify-content: center;
+}
+
+.board {
+    aspect-ratio: 1 / 1;
+    height: min(95vh, 95vw);
+    width: min(95vh, 95vw);
+    display: grid;
+    border: 1px solid;
+}
+
+.square {
+    aspect-ratio: 1 / 1;
+    display: flex; 
+    justify-content: center;
+    align-items: center;
+    border: 1px solid;    
+}
+
+.squareText {
+    margin: 0 0 0 0;
+}
+
+.enabledSquare {
+    cursor: pointer;
+    background-color: green;
+}
+
+.lastSquare {
+    background-color: yellow;
+    font-weight: bolder;
+}
+
+.infoPanel {
+    height: min(95vh, 95vw);
+    display: flex;
+    flex-direction: column;
+    margin-right: 5vw;
+}
+
+.title {
+    margin-top: 0px;
+}
+
+.gameControls {
+    display: flex;
+    justify-content: center;
+}
+
+.gameControl {
+    aspect-ratio: 1 / 1;
+    height: min(9.5vh, 9.5vw);
+    width: min(9.5vh, 9.5vw);
+    display: flex; 
+    justify-content: center;
+    align-items: center;
+    padding-left: min(1vh, 1vw);
+    padding-right: min(1vh, 1vw);
+}

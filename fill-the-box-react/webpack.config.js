@@ -29,18 +29,30 @@ var config = {
       },
       {
         test: /\.css$/i,
-        use: ["style-loader", "css-loader"]
+        use: [
+          'style-loader',
+          {
+            loader: "css-loader",
+            options: {
+              modules: {
+                namedExport: false
+              }
+            }
+          }
+        ]
       }
     ],
   },
   plugins: [
     new CopyPlugin({
       patterns: [{from: '.', to: '.', context: 'public'}],
-    }),
+    })
   ],
   devServer: {
+    hot: "only",
     static: {
-      directory:path.join(__dirname, 'dist')
+      directory:path.join(__dirname, 'dist'),
+      serveIndex: true
     },
     port: 9099,
   }
