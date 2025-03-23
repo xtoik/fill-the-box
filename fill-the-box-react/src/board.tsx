@@ -3,6 +3,7 @@ import IconButton from '@mui/material/IconButton';
 import Undo from '@mui/icons-material/Undo';
 import Redo from '@mui/icons-material/Redo';
 import RestartAlt from '@mui/icons-material/RestartAlt';
+import Save from '@mui/icons-material/Save';
 import classnames from 'classnames';
 import styles from './board.module.css';
 
@@ -11,12 +12,66 @@ interface BoardProps {
     columnsNumber: number;
 }
 
+interface HighScore {
+    score: number,
+    elapsed: number,
+    name: string
+}
+
 export function Board(props: BoardProps) {
   const [gridColumns, setGridColumns] = useState("");
   const [gridRows, setGridRows] = useState("");
   const [sequence, setSequence] = useState(new Array<number>());
   const [enabledSquares, setEnabledSquares] = useState(new Array<number>());
   const [undoSequence, setUndoSequence] = useState(new Array<number>());
+  const [started, setStarted] = useState<null|number>(null);
+  const [elapsed, setElapsed] = useState<null|number>(null);
+  const [finished, setFinished] = useState(true);
+  const [highScores, setHighScores] = useState(new Array<HighScore>());
+  const [isHighScore, setIsHighScore] = useState(false);
+  
+  const HIGH_SCORES_STORAGE_ITEM = "highScores";
+  const NUMBER_HIGH_SCORES = 5;
+
+  const getHighScores = () => {
+    const lastHighScores: Array<HighScore> = JSON.parse(localStorage.getItem(HIGH_SCORES_STORAGE_ITEM) ?? "[]");
+    return lastHighScores;
+  };
+
+  const addNewHighScore = (newHighScores: HighScore[]) => {
+    const newHighScore: HighScore = {
+        score: sequence.length,
+        elapsed: elapsed ?? 0,
+        name: ""
+    };
+    newHighScores.push(newHighScore);
+    newHighScores.sort((x, y) => {
+        if (x.score > y.score) {
+            return -1;
+        } else if (x.score < y.score) {
+            return 1;
+        } else if (x.elapsed < y.elapsed) {
+            return -1;
+        } else {
+            return 1;
+        }
+    });
+
+    return newHighScore;
+  };
+
+  useEffect(() => {
+    if (finished) {
+        const currentHighScores = getHighScores();
+        setHighScores([...currentHighScores]);
+        if (started !== null) {
+            const newHighScore = addNewHighScore(currentHighScores);
+            setIsHighScore(currentHighScores.indexOf(newHighScore) < NUMBER_HIGH_SCORES);
+        }
+    } else {
+        setIsHighScore(false);
+    }
+  }, [finished, started]);
   
   useEffect(() => {
     let columns = "";
@@ -45,6 +100,22 @@ export function Board(props: BoardProps) {
         calculateEnabledSquares(lineColumnLastSquare.line, lineColumnLastSquare.column);
     }
   }, [sequence]);
+
+  useEffect(() => {
+    if (started !== null && !finished) {
+        if (elapsed === null) {
+            setElapsed(Date.now() - started);
+        }
+
+        const interval = setInterval(() => {
+            if (started !== null && !finished) {
+                setElapsed(Date.now() - started);
+            }
+        }, 1000);
+
+        return () => clearInterval(interval);
+    }
+  }, [started, elapsed, finished]);
 
   const getSquare = (line: number, column: number) => {
     return line * props.columnsNumber + column;
@@ -76,6 +147,11 @@ export function Board(props: BoardProps) {
         let newSequence = [...sequence, square];
         setSequence(newSequence);
         setUndoSequence([]);
+        
+        if (started === null) {
+            setStarted(Date.now());
+            setFinished(false); 
+        }
     }
   };
 
@@ -121,6 +197,11 @@ export function Board(props: BoardProps) {
     }
 
     setEnabledSquares(newEnabledSquares);
+    if (newEnabledSquares.length == 0) {
+        setFinished(true);
+    } else if (finished) {
+        setFinished(false);
+    }
   };
 
   const undo = () => {
@@ -143,9 +224,80 @@ export function Board(props: BoardProps) {
 
   const restart = () => {
     if (sequence.length > 0) {
-        setUndoSequence([])
         setSequence([]);
     }
+
+    if (undoSequence.length > 0) {
+        setUndoSequence([]);
+    }
+
+    if (started !== null) {
+        setStarted(null);
+    }
+
+    if (elapsed !== null) {
+        setElapsed(null);
+    }
+  };
+
+  const formatElapsed = (ms: number, includeMs: boolean) => {
+    var d, h, m, s;
+    s = Math.floor(ms / 1000);
+    ms = ms % 1000;
+    m = Math.floor(s / 60);
+    s = s % 60;
+    h = Math.floor(m / 60);
+    m = m % 60;
+    d = Math.floor(h / 24);
+    h = h % 24;
+    var str = "";
+    if (d > 0) {
+        str += d + ".";
+    }
+
+    if (h > 9) {
+        str += h + ":";
+    } else if (h > 0) {
+        str += "0" + h + ":";
+    }
+    
+    if (m > 9) {
+        str += m + ":";
+    } else {
+        str += "0" + m + ":";
+    }
+
+    if (s > 9) {
+        str += s;
+    } else {
+        str += "0" + s;
+    }
+
+    if (includeMs) {
+        if (ms > 99) {
+            str += "." + ms;
+        } else if (ms > 9) {
+            str += ".0" + ms;
+        } else {
+            str += ".00" + ms;
+        }
+    }
+
+    return str;
+  };
+
+  const storeHighScore: React.FormEventHandler<HTMLFormElement> = (e) => {
+    e.preventDefault();
+    const form: HTMLFormElement = e.currentTarget;
+    const formData = new FormData(form);
+    const candidateHighScores = getHighScores();
+    const newHighScore = addNewHighScore(candidateHighScores);
+    newHighScore.name = formData.get("txtName")?.toString().toUpperCase() ?? "";
+    const newHighScores = candidateHighScores.slice(0, NUMBER_HIGH_SCORES);
+    setHighScores(newHighScores);
+    localStorage.setItem(HIGH_SCORES_STORAGE_ITEM, JSON.stringify(newHighScores));
+    setIsHighScore(false);
+    restart();
   };
 
   const lastSquare = sequence.length == 0 ? null : sequence[sequence.length - 1];
@@ -178,6 +330,21 @@ export function Board(props: BoardProps) {
                     </IconButton>
                 </div>
             </div>
+            <p className={styles.elapsedTime}>{elapsed ? formatElapsed(elapsed, finished) : ""}</p>
+            {highScores.length > 0 && (
+                <div className={styles.highScores}>
+                    <div className={styles.highScoresTitle}>
+                        Hall of Fame
+                    </div>
+                    {highScores.map((x, i) => (
+                        <React.Fragment key={`hof-${i}`}>
+                            <div className={styles.highScoreName}>{x.name}</div>
+                            <div className={styles.highScorePoints}>{x.score}</div>
+                            <div className={styles.highScoreElapsed}>{formatElapsed(x.elapsed, true)}</div>
+                        </React.Fragment>
+                    ))}
+                </div>
+            )}            
         </div>
         <div className={styles.board} style={{gridTemplateColumns: gridColumns, gridTemplateRows: gridRows}}>
             {[...Array(props.linesNumber)].map((x, i) => (
@@ -197,6 +364,26 @@ export function Board(props: BoardProps) {
                     )}
                 </React.Fragment>
             ))}
+            {isHighScore && (
+                <>
+                    <div className={styles.boardOverlay}>                
+                    </div>
+                    <div className={styles.boardOverlayMessage}>
+                        <form className={styles.boardOverlayForm} method="post" 
+                            onSubmit={storeHighScore}>
+                            <center><p className={styles.boardOverlayTitle}>Enter your name:</p></center>
+                            <center>
+                                <input className={styles.boardOverlayInput} type="text" 
+                                        name="txtName" maxLength={3} autoFocus />
+                                <IconButton aria-label="save" type="submit" size={"large"}
+                                            sx={gameControlSxProps}>
+                                    <Save sx={gameControlSxProps} />
+                                </IconButton>
+                            </center>
+                        </form>
+                    </div>
+                </>
+            )}
         </div>
     </div>
   );

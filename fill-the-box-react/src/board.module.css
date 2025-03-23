@@ -12,6 +12,7 @@
     width: min(95vh, 95vw);
     display: grid;
     border: 1px solid;
+    position: relative;
 }
 
 .square {
@@ -36,6 +37,53 @@
     font-weight: bolder;
 }
 
+.boardOverlay {
+    aspect-ratio: 1 / 1;
+    height: min(95vh, 95vw);
+    width: min(95vh, 95vw);
+    position: absolute;
+    opacity: 50%;
+    background-color: gray;
+    z-index: 1;
+}
+
+.boardOverlayMessage {
+    display: flex;
+    background-color: whitesmoke;
+    border: 1px solid;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 100%;
+    z-index: 2;
+    padding: min(3vh, 3vw) min(3vh, 3vw) min(3vh, 3vw) min(3vh, 3vw);
+    align-items: center;
+    justify-content: center;
+}
+
+.boardOverlayTitle {
+    margin-top: 0;
+    font-size: min(4vh, 4vw);
+    font-weight: bolder;
+}
+
+.boardOverlayForm {
+    margin-block-end: 0;
+}
+
+.boardOverlayInput {
+    font-size: min(4vh, 4vw);
+    width: min(14vh, 14vw);
+    text-align: center;
+    border: 1px solid;
+    text-transform: uppercase;
+}
+
+.boardOverlayButton {
+    font-size: min(4vh, 4vw);
+}
+
 .infoPanel {
     height: min(95vh, 95vw);
     display: flex;
@@ -45,6 +93,11 @@
 
 .title {
     margin-top: 0px;
+}
+
+.elapsedTime {
+    font-size: min(5vh, 5vw);
+    text-align: center;
 }
 
 .gameControls {
@@ -61,4 +114,29 @@
     align-items: center;
     padding-left: min(1vh, 1vw);
     padding-right: min(1vh, 1vw);
+}
+
+.highScores {
+    display: grid;
+    grid-template-columns: auto auto auto;
+    grid-template-rows: repeat(6, 1fr);
+}
+
+.highScoresTitle {
+    grid-column: 1 / span 3;
+    text-align: center;
+    font-size: min(4vh, 4vw);
+    font-weight: bolder;
+}
+
+.highScoreName {
+    text-align: right;
+}
+
+.highScorePoints {
+    text-align: center;
+}
+
+.highScoreElapsed {
+    text-align: left;
 }
