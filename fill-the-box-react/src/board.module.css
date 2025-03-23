@@ -88,7 +88,7 @@
     height: min(95vh, 95vw);
     display: flex;
     flex-direction: column;
-    margin-right: 5vw;
+    margin-right: min(5vh, 5vw);
 }
 
 .title {
@@ -116,10 +116,16 @@
     padding-right: min(1vh, 1vw);
 }
 
-.highScores {
+.highScores, .highScores2 {
     display: grid;
     grid-template-columns: auto auto auto;
     grid-template-rows: repeat(6, 1fr);
+}
+
+.highScores2 {
+    display: none;
+    margin-top: min(5vh, 5vw);
+    min-width: min(55vh, 55vw);
 }
 
 .highScoresTitle {
@@ -139,4 +145,24 @@
 
 .highScoreElapsed {
     text-align: left;
+}
+
+@media (orientation: portrait) {
+    .gameContainer {
+        flex-direction: column;
+    }
+    
+    .infoPanel {
+        height: unset;
+        margin-right: unset;
+        margin-bottom: min(5vh, 5vw);
+    }
+
+    .highScores {
+        display: none;
+    }
+
+    .highScores2 {
+        display: grid;
+    }
 }

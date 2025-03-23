@@ -385,6 +385,20 @@ export function Board(props: BoardProps) {
                 </>
             )}
         </div>
+        {highScores.length > 0 && (
+            <div className={styles.highScores2}>
+                <div className={styles.highScoresTitle}>
+                    Hall of Fame
+                </div>
+                {highScores.map((x, i) => (
+                    <React.Fragment key={`hof-${i}`}>
+                        <div className={styles.highScoreName}>{x.name}</div>
+                        <div className={styles.highScorePoints}>{x.score}</div>
+                        <div className={styles.highScoreElapsed}>{formatElapsed(x.elapsed, true)}</div>
+                    </React.Fragment>
+                ))}
+            </div>
+        )}
     </div>
   );
 }
