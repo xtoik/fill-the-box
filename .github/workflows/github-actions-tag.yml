@@ -1,4 +1,4 @@
-name: PagerDuty Helper GitHub Push Actions
+name: fill-the-box GitHub Tags Actions
 on:
   push:
     tags:
@@ -11,23 +11,23 @@ jobs:
       steps:
         - name: Check out repository code
           uses: actions/checkout@v4
-        - id: checkout-lint-build-test
+        - id: lint-build-test
           uses: ./.github/actions/lint-build-test
         - uses: octokit/request-action@v2.x
-          id: create_release
+          id: create_release_website
           with:
             route: POST /repos/{owner}/{repo}/releases
             owner: xtoik
-            repo: pagerduty-helper
-            name: PagerDuty Helper ${{  github.ref_name }}
+            repo: fill-the-box
+            name: FillTheBox-React ${{  github.ref_name }}
             tag_name: ${{  github.ref_name }}
             generate_release_notes: true
           env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        - name: Package chrome extension
+        - name: Package Web Site
           run: |
-            mv dist pagerduty-helper_${{  github.ref_name }} 
-            zip -r pagerduty-helper_${{  github.ref_name }}.zip pagerduty-helper_${{  github.ref_name }}/
-            gh release upload ${{  github.ref_name }} pagerduty-helper_${{  github.ref_name }}.zip
+            mv dist fill-the-box-react_${{  github.ref_name }} 
+            zip -r fill-the-box-react_${{  github.ref_name }}.zip fill-the-box-react_${{  github.ref_name }}/
+            gh release upload ${{  github.ref_name }} fill-the-box-react_${{  github.ref_name }}.zip
           env:
             GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

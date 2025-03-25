@@ -13,5 +13,5 @@ jobs:
         steps:
             - name: Check out repository code
               uses: actions/checkout@v4
-            - id: checkout-lint-build-test
+            - id: lint-build-test
               uses: ./fill-the-box-react/.github/actions/lint-build-test
