@@ -6,9 +6,12 @@ runs:
       - name: Install
         run: npm install
         shell: bash
+        working-directory: ./fill-the-box-react
       - name: Lint
         run: npm run lint
         shell: bash
+        working-directory: ./fill-the-box-react
       - name: Build
         run: npm run pack
         shell: bash
+        working-directory: ./fill-the-box-react
