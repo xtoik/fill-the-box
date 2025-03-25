@@ -6,8 +6,8 @@ on:
       - 'feature/**'
       - 'hotfix/**'
     paths:
-      - ./fill-the-box-react/**
-      - ./github/**
+      - fill-the-box-react/**
+      - github/**
 jobs:
     lint-build-test:
         runs-on: ubuntu-latest
